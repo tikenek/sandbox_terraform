@@ -14,21 +14,9 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
-  # subnet_id = element(module.vpc.public_subnets_ids, 0)
   subnet_id     = "${aws_subnet.public_subnets.*.id}"
   depends_on    = [aws_internet_gateway.gw]
-  # aws_internet_gateway.gw
 }
-
-# subnet_id = element(["$ {aws_subnet.public_subnets_ids, 0}"])
-# subnet_ids = "${aws_subnet.priv_subnet.*.id}"
-# element(module.vpc.vpc_new.public_subnets_ids, 0)
-#subnet_id = element(module.vpc_new.public_subnets_ids, 0)
-
-
-# "${aws_subnet.private.*.id}"
-
-# depends_on =[module.vpc_new]
 
 #Public Subnets
 resource "aws_subnet" "public_subnets" {
