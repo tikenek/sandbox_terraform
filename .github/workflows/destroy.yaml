@@ -1,0 +1,47 @@
+name: 'Terraform-destroy'
+
+on:
+  push:
+    branches:
+      - master
+    
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+#    environment: #your evn name here
+  
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Install nodejs
+    - uses: actions/setup-node@v2
+      with:
+          node-version: '14'
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+  
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      run: terraform init 
+    
+    # Checks that all Terraform configuration files adhere to a canonical format and style
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt 
+    
+    # Validates the configuration
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+  
+    # Execute terraform destroy
+    - name: Terraform Destroy
+      id: destroy
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform destroy -auto-approve
