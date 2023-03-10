@@ -19,7 +19,7 @@ jobs:
     # Install nodejs
     - uses: actions/setup-node@v2
       with:
-          node-version: '14'
+          node-version: '16'
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file
     - name: Setup Terraform
