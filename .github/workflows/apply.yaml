@@ -6,6 +6,8 @@ on:
       - master
      
  
+
+ 
 jobs:
   terraform:
     name: 'Terraform'
@@ -81,4 +83,34 @@ jobs:
         TF_ACTION_WORKING_DIR: '.'
         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        
+
+
+name: Create Terraform vars
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-vars:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create tfvars file
+      env:
+        REGION: ${{ secrets.REGION }}
+        CIDR_BLOCK: ${{ secrets.CIDR_BLOCK }}
+        PUBLIC_SUBNETS_CIDR: ${{ secrets.PUBLIC_SUBNETS_CIDR }}
+        PRIVATE_SUBNETS_CIDR: ${{ secrets.PRIVATE_SUBNETS_CIDR }}
+        AVAILABILITY_ZONES: ${{ secrets.AVAILABILITY_ZONES }}
+        PRIVATE_SUBNETS: ${{ secrets.PRIVATE_SUBNETS }}
+        PUBLIC_SUBNETS: ${{ secrets.PUBLIC_SUBNETS }}
+      run: |
+        echo "region=\"$REGION\"" >> terraform.tfvars
+        echo "cidr_block=\"$CIDR_BLOCK\"" >> terraform.tfvars
+        echo "public_subnets_cidr=[$PUBLIC_SUBNETS_CIDR]" >> terraform.tfvars
+        echo "private_subnets_cidr=[$PRIVATE_SUBNETS_CIDR]" >> terraform.tfvars
+        echo "availability_zones=[$AVAILABILITY_ZONES]" >> terraform.tfvars
+        echo "private_subnets=[$PRIVATE_SUBNETS]" >> terraform.tfvars
+        echo "public_subnets=[$PUBLIC_SUBNETS]" >> terraform.tfvars
+      shell: bash
