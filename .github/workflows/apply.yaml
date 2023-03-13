@@ -114,3 +114,4 @@ jobs:
         echo "private_subnets=[$PRIVATE_SUBNETS]" >> terraform.tfvars
         echo "public_subnets=[$PUBLIC_SUBNETS]" >> terraform.tfvars
       shell: bash
+      
