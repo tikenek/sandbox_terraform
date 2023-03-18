@@ -144,3 +144,53 @@ resource "aws_iam_policy_attachment" "cloudtrail" {
   policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSCloudTrailServiceRolePolicy"
   roles      = [aws_iam_role.cloudtrail.name]
 }
+
+
+
+
+#2
+# CloudTrail
+resource "aws_cloudtrail" "main" {
+  name                          = "main-cloudtrail"
+  s3_bucket_name                = aws_s3_bucket.main_bucket.id
+  include_global_service_events = true
+  is_multi_region_trail         = true
+}
+
+# Flow Logs
+resource "aws_flow_log" "main" {
+  iam_role_arn    = aws_iam_role.flowlog.arn
+  log_destination = aws_cloudwatch_log_group.flowlog.arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
+}
+
+resource "aws_cloudwatch_log_group" "flowlog" {
+  name = "main-flowlog"
+}
+
+resource "aws_iam_role" "flowlog" {
+  name               = "main-flowlog-role"
+  assume_role_policy = data.aws_iam_policy_document.flowlog.json
+}
+
+data "aws_iam_policy_document" "flowlog" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+    ]
+
+    resources = ["*"]
+  }
+}
